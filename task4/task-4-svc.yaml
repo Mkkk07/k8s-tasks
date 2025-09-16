@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-containers-pod
+  labels:
+    app: two-containers
+spec:
+  containers:
+  - name: container-one
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: html-volume
+      mountPath: /usr/share/nginx/html
+  - name: container-two
+    image: nginx
+    ports:
+    - containerPort: 50   # مهم جداً يكون 50
+    volumeMounts:
+    - name: html-volume-2
+      mountPath: /usr/share/nginx/html
+    env:
+    - name: PORT
+      valueFrom:
+        configMapKeyRef:
+          name: custom-port
+          key: PORT
+    volumeMounts:
+    - name: nginx-config-50
+      mountPath: /etc/nginx/conf.d
+  volumes:
+  - name: html-volume
+    emptyDir: {}
+  - name: html-volume-2
+    emptyDir: {}
+  - name: nginx-config-50
+    configMap:
+      name: nginx-config-50
